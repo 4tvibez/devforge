@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>NEON RIFT — Arcade</title>
+<style>
+:root{--bg:#070812;--panel:#101326;--text:#f4f7ff;--muted:#8991ad;--cyan:#55f6ff;--pink:#ff4fd8;--violet:#9b6cff}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,sans-serif}
+body{display:grid;place-items:center}
+canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
+.ui{position:fixed;inset:0;pointer-events:none;padding:18px;display:flex;flex-direction:column;justify-content:space-between}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.brand{font-weight:900;letter-spacing:.16em;font-size:13px;text-shadow:0 0 18px #55f6ff88}
+.stats{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.pill{background:#0c1020c9;border:1px solid #ffffff16;border-radius:999px;padding:8px 12px;backdrop-filter:blur(10px);font-size:11px;color:var(--muted)}
+.pill b{color:var(--text);margin-left:5px}
+.bottom{display:flex;justify-content:center}
+.hint{max-width:680px;text-align:center;color:#8f98b6;font-size:12px;line-height:1.5;background:#090c18bb;border:1px solid #ffffff12;border-radius:16px;padding:10px 15px;backdrop-filter:blur(12px)}
+.overlay{position:fixed;inset:0;display:grid;place-items:center;background:#05060cc7;backdrop-filter:blur(8px);z-index:4}
+.card{width:min(560px,calc(100% - 32px));padding:30px;border:1px solid #ffffff16;border-radius:28px;background:linear-gradient(145deg,#11162cf2,#090b17f2);box-shadow:0 30px 100px #000b}
+.kicker{color:var(--cyan);font-size:11px;font-weight:800;letter-spacing:.2em}
+h1{font-size:clamp(42px,9vw,82px);line-height:.9;margin:10px 0 14px;letter-spacing:-.06em}
+p{color:#9ca5c2;line-height:1.6}
+button{border:0;color:#061018;background:linear-gradient(90deg,var(--cyan),#a9ffff);font-weight:900;padding:13px 20px;border-radius:14px;cursor:pointer;box-shadow:0 0 28px #55f6ff44}
+button:hover{transform:translateY(-1px);filter:brightness(1.08)}
+.hidden{display:none}
+kbd{padding:2px 6px;border:1px solid #ffffff20;border-radius:5px;background:#ffffff09;color:#cbd2e9}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="ui">
+  <div class="top">
+    <div class="brand">NEON RIFT // 01</div>
+    <div class="stats">
+      <div class="pill">SCORE <b id="score">0</b></div>
+      <div class="pill">COMBO <b id="combo">x1</b></div>
+      <div class="pill">BEST <b id="best">0</b></div>
+    </div>
+  </div>
+  <div class="bottom"><div class="hint">Move with <kbd>WASD</kbd>/<kbd>ARROWS</kbd> · Touch/drag on mobile · Destroy the pink rifts · Survive as the arena accelerates</div></div>
+</div>
+<div class="overlay" id="start">
+  <div class="card">
+    <div class="kicker">A MICRO ARCADE FROM SCRATCH</div>
+    <h1>NEON<br>RIFT.</h1>
+    <p>A zero-API browser game with procedural particles, adaptive difficulty, synthesized audio, combo scoring and touch controls. No libraries. No assets. Just JavaScript.</p>
+    <button id="play">ENTER THE RIFT →</button>
+  </div>
+</div>
+<div class="overlay hidden" id="over">
+  <div class="card">
+    <div class="kicker">RIFT COLLAPSED</div>
+    <h1 id="final">0</h1>
+    <p id="grade"></p>
+    <button id="again">RUN IT BACK →</button>
+  </div>
+</div>
+<script>
+(()=>{"use strict";
+const C=document.getElementById("c"),x=C.getContext("2d"),scoreEl=document.getElementById("score"),comboEl=document.getElementById("combo"),bestEl=document.getElementById("best"),start=document.getElementById("start"),over=document.getElementById("over"),finalEl=document.getElementById("final"),grade=document.getElementById("grade");
+let W=innerWidth,H=innerHeight,D=devicePixelRatio||1;
+function resize(){W=innerWidth;H=innerHeight;C.width=W*D;C.height=H*D;x.setTransform(D,0,0,D,0,0)}addEventListener("resize",resize);resize();
+const rnd=(a,b)=>Math.random()*(b-a)+a, clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+let audio;
+function beep(freq,dur=.05,type="sine",gain=.025){if(!audio)return;const o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.value=freq;g.gain.value=gain;o.connect(g).connect(audio.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,audio.currentTime+dur);o.stop(audio.currentTime+dur)}
+const state={running:false,t:0,score:0,combo:1,best:+localStorage.neonRiftBest||0,speed:1,player:{x:W/2,y:H/2,r:11},rifts:[],parts:[],stars:[],keys:new Set(),touch:null};
+bestEl.textContent=state.best;
+for(let i=0;i<150;i++)state.stars.push({x:Math.random()*W,y:Math.random()*H,z:rnd(.2,1)});
+function reset(){state.t=0;state.score=0;state.combo=1;state.speed=1;state.rifts=[];state.parts=[];state.player={x:W/2,y:H/2,r:11};scoreEl.textContent=0;comboEl.textContent="x1";for(let i=0;i<4;i++)spawnRift()}
+function spawnRift(){const a=rnd(0,Math.PI*2),d=Math.max(W,H)*.62;state.rifts.push({x:W/2+Math.cos(a)*d,y:H/2+Math.sin(a)*d,r:rnd(12,22),life:0,phase:rnd(0,6)})}
+function burst(px,py,hue){for(let i=0;i<22;i++){const a=rnd(0,Math.PI*2),s=rnd(1,5);state.parts.push({x:px,y:py,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,hue})}}
+function hit(r){const p=state.player;return Math.hypot(r.x-p.x,r.y-p.y)<r.r+p.r+4}
+function move(dt){let k=state.keys,dx=(k.has("ArrowRight")||k.has("d")?1:0)-(k.has("ArrowLeft")||k.has("a")?1:0),dy=(k.has("ArrowDown")||k.has("s")?1:0)-(k.has("ArrowUp")||k.has("w")?1:0);if(state.touch){dx=(state.touch.x-state.player.x);dy=(state.touch.y-state.player.y);const m=Math.hypot(dx,dy);if(m>8){dx/=m;dy/=m}else dx=dy=0}else{const m=Math.hypot(dx,dy)||1;dx/=m;dy/=m}const sp=330*dt;state.player.x=clamp(state.player.x+dx*sp,25,W-25);state.player.y=clamp(state.player.y+dy*sp,25,H-25)}
+function end(){state.running=false;const s=Math.floor(state.score);if(s>state.best){state.best=s;localStorage.neonRiftBest=s;bestEl.textContent=s}finalEl.textContent=s;grade.textContent=s>900?"ABSURD. The rift barely survived you.":s>500?"ELITE RUN. Your reaction speed is dangerous.":s>200?"SOLID RUN. The system is starting to fear you.":"WARM-UP COMPLETE. Next run, chase the combo.";over.classList.remove("hidden");beep(110,.35,"sawtooth",.05)}
+function update(dt){state.t+=dt;state.speed=1+state.t*.045;move(dt);if(Math.random()<dt*(1.2+state.t*.03))spawnRift();
+for(let i=state.rifts.length-1;i>=0;i--){const r=state.rifts[i],dx=state.player.x-r.x,dy=state.player.y-r.y,d=Math.hypot(dx,dy)||1;r.x+=dx/d*dt*(55+state.t*4);r.y+=dy/d*dt*(55+state.t*4);r.life+=dt;r.phase+=dt*5;
+if(hit(r)){burst(r.x,r.y,"pink");state.rifts.splice(i,1);state.score+=10*state.combo;state.combo=Math.min(12,state.combo+1);scoreEl.textContent=Math.floor(state.score);comboEl.textContent="x"+state.combo;beep(240+state.combo*35,.07,"triangle",.035)}
+else if(r.x<-80||r.x>W+80||r.y<-80||r.y>H+80){state.rifts.splice(i,1);state.combo=Math.max(1,state.combo-1);comboEl.textContent="x"+state.combo;beep(90,.08,"square",.018)}
+}
+for(let i=state.parts.length-1;i>=0;i--){const p=state.parts[i];p.x+=p.vx*60*dt;p.y+=p.vy*60*dt;p.vx*=.97;p.vy*=.97;p.life-=dt*1.8;if(p.life<=0)state.parts.splice(i,1)}
+}
+function draw(){x.clearRect(0,0,W,H);const g=x.createRadialGradient(W/2,H/2,10,W/2,H/2,Math.max(W,H)*.75);g.addColorStop(0,"#15142b");g.addColorStop(1,"#05060d");x.fillStyle=g;x.fillRect(0,0,W,H);
+for(const s of state.stars){s.y+=.18*s.z;if(s.y>H)s.y=0;x.fillStyle="rgba(180,220,255,"+(s.z*.5)+")";x.fillRect(s.x,s.y,s.z*1.5,s.z*1.5)}
+x.save();x.translate(W/2,H/2);x.rotate(state.t*.04);for(let r=0;r<4;r++){x.strokeStyle="rgba(85,246,255,"+(0.08-r*.012)+")";x.lineWidth=1;x.beginPath();x.arc(0,0,80+r*95+Math.sin(state.t+r)*4,0,Math.PI*2);x.stroke()}x.restore();
+for(const r of state.rifts){const pulse=Math.sin(r.phase)*3;x.shadowBlur=22;x.shadowColor="#ff4fd8";x.strokeStyle="#ff4fd8";x.lineWidth=3;x.beginPath();x.arc(r.x,r.y,r.r+pulse,0,Math.PI*2);x.stroke();x.shadowBlur=0;x.strokeStyle="#ff9bea55";x.beginPath();x.arc(r.x,r.y,r.r+8+pulse,0,Math.PI*2);x.stroke()}
+for(const p of state.parts){x.globalAlpha=Math.max(0,p.life);x.fillStyle=p.hue==="pink"?"#ff4fd8":"#55f6ff";x.fillRect(p.x,p.y,3,3)}x.globalAlpha=1;
+const p=state.player;x.shadowBlur=28;x.shadowColor="#55f6ff";x.fillStyle="#55f6ff";x.beginPath();x.arc(p.x,p.y,p.r,0,Math.PI*2);x.fill();x.shadowBlur=0;x.strokeStyle="#fff";x.lineWidth=2;x.beginPath();x.arc(p.x,p.y,p.r+6+Math.sin(state.t*8)*2,0,Math.PI*2);x.stroke()
+}
+let last=performance.now();function loop(now){const dt=Math.min(.033,(now-last)/1000);last=now;if(state.running)update(dt);draw();requestAnimationFrame(loop)}requestAnimationFrame(loop);
+addEventListener("keydown",e=>{state.keys.add(e.key);if(e.key===" "&&!state.running&&!start.classList.contains("hidden"))begin();if(e.key==="Escape")state.touch=null});addEventListener("keyup",e=>state.keys.delete(e.key));
+function pointer(e){const q=e.touches?e.touches[0]:e;state.touch={x:q.clientX,y:q.clientY}}addEventListener("pointerdown",pointer);addEventListener("pointermove",e=>{if(state.touch)pointer(e)});addEventListener("pointerup",()=>state.touch=null);
+function begin(){if(!audio)audio=new(window.AudioContext||window.webkitAudioContext)();audio.resume();reset();start.classList.add("hidden");over.classList.add("hidden");state.running=true;beep(440,.12,"sine",.03)}
+document.getElementById("play").onclick=begin;document.getElementById("again").onclick=begin;
+})();
+</script>
+</body>
+</html>
