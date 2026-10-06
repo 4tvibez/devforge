@@ -1,80 +1,34 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DEVFORGE - Offline Developer Toolkit</title><style>:root{--bg:#090d14;--p:#111824;--line:#253044;--text:#eef4ff;--muted:#91a0b8;--a:#66e6a5}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px system-ui}.app{display:flex;min-height:100vh}.side{width:230px;position:fixed;inset:0 auto 0 0;background:#0c111a;border-right:1px solid var(--line);padding:22px 14px}.brand{font-size:22px;font-weight:800;margin:0 10px 24px}.brand span{color:var(--a)}nav button{display:block;width:100%;border:0;background:transparent;color:var(--muted);padding:12px;border-radius:10px;text-align:left;margin:3px 0}nav button.active,nav button:hover{background:#182334;color:var(--text)}main{margin-left:230px;width:calc(100% - 230px);padding:28px;max-width:1500px}.top{display:flex;justify-content:space-between;margin-bottom:24px}.eyebrow{color:var(--a);font-size:12px;font-weight:800;letter-spacing:.12em}.title{font-size:30px;font-weight:800}.sub,.card p{color:var(--muted)}.badge{border:1px solid #28543f;color:var(--a);padding:7px 10px;border-radius:20px;height:max-content}.view{display:none}.view.active{display:block}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card{background:linear-gradient(180deg,var(--p),#0d131e);border:1px solid var(--line);border-radius:15px;padding:18px}.wide{grid-column:span 2}.full{grid-column:1/-1}.card h3{margin-top:0}.stat{font-size:28px;font-weight:800}button,input,textarea,select{font:inherit}input,textarea,select{width:100%;background:#090f18;color:var(--text);border:1px solid var(--line);border-radius:9px;padding:10px}textarea{min-height:145px}.btn{background:#172232;color:var(--text);border:1px solid var(--line);border-radius:9px;padding:9px 12px}.primary{background:var(--a);color:#06120b;font-weight:800}.row{display:flex;gap:9px;flex-wrap:wrap}.out{margin-top:10px;background:#080d15;border:1px solid var(--line);border-radius:9px;padding:12px;white-space:pre-wrap;word-break:break-word}.editor{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.editor textarea{height:300px;font-family:monospace}.preview{width:100%;height:300px;background:#fff;border:0;border-radius:9px;margin-top:10px}.gradient{height:120px;border-radius:10px;margin-top:10px}.snippet{display:flex;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}.challenge{border:1px solid var(--line);border-radius:10px;padding:13px;margin:10px 0}.challenge code{display:block;background:#080d15;padding:8px;border-radius:7px}@media(max-width:800px){.side{width:65px;padding:15px 7px}.brand{font-size:0;text-align:center}.brand span{font-size:21px}nav button{font-size:0;text-align:center}nav button:first-letter{font-size:18px}main{margin-left:65px;width:calc(100% - 65px);padding:16px}.grid,.editor{grid-template-columns:1fr}.wide{grid-column:auto}}</style></head><body><div class="app"><aside class="side"><div class="brand">DEV<span>FORGE</span></div><nav><button class="active" data-view="home">⌂ Dashboard</button><button data-view="playground">▣ Playground</button><button data-view="tools">⚙ Tools</button><button data-view="snippets">▤ Snippets</button><button data-view="challenges">◆ Challenges</button></nav></aside><main><header class="top"><div><div class="eyebrow">OFFLINE DEVELOPER TOOLKIT</div><div class="title" id="title">Build faster. Stay focused.</div><div class="sub">No API key. No backend. Your data stays in this browser.</div></div><div class="badge">● LOCAL ONLY</div></header><section id="home" class="view active"><div class="grid"><div class="card"><div class="stat">0</div><div class="sub">API keys required</div></div><div class="card"><div class="stat">100%</div><div class="sub">Browser powered</div></div><div class="card"><div class="stat" id="count">0</div><div class="sub">Saved snippets</div></div><div class="card wide"><h3>Quick launch</h3><p>Open the tools you need and keep coding.</p><div class="row"><button class="btn primary" data-go="playground">Open Playground</button><button class="btn" data-go="tools">Open Tools</button><button class="btn" data-go="challenges">Practice</button></div></div><div class="card"><h3>Private by design</h3><p>Snippets use localStorage. Nothing is sent to a server.</p></div></div></section><section id="playground" class="view"><div class="card"><h3>Live HTML / CSS / JS Playground</h3><p>Edit code and run it instantly.</p><div class="editor"><textarea id="html"><h1>Hello DEVFORGE</h1><p>Edit me.</p></textarea><textarea id="css">body{font-family:system-ui;padding:30px}h1{color:#1769ff}</textarea><textarea id="js">document.body.insertAdjacentHTML("beforeend","<p>JavaScript works!</p>");</textarea></div><br><button class="btn primary" id="run">Run preview</button> <button class="btn" id="reset">Reset</button><iframe class="preview" id="frame" sandbox="allow-scripts"></iframe></div></section><section id="tools" class="view"><div class="grid"><div class="card wide"><h3>JSON Formatter / Validator</h3><textarea id="json" placeholder="Paste JSON here"></textarea><br><br><button class="btn primary" id="fmt">Format</button> <button class="btn" id="mini">Minify</button><div class="out" id="jsonout"></div></div><div class="card"><h3>Password Generator</h3><input id="plen" type="number" min="4" max="80" value="16"><br><br><button class="btn primary" id="pass">Generate</button><div class="out" id="passout"></div></div><div class="card"><h3>Binary / Decimal / Hex</h3><input id="num" placeholder="Enter number"><select id="base"><option value="10">Decimal to Binary</option><option value="2">Binary to Decimal</option><option value="16">Hex to Decimal</option></select><br><br><button class="btn primary" id="convert">Convert</button><div class="out" id="numout"></div></div><div class="card"><h3>Gradient Generator</h3><input id="c1" type="color" value="#66e6a5"><input id="c2" type="color" value="#66a8ff"><input id="angle" type="range" min="0" max="360" value="135"><div class="gradient" id="grad"></div><div class="out" id="gradout"></div></div><div class="card"><h3>CSS Shadow Generator</h3><input id="blur" type="range" min="0" max="60" value="20"><input id="opa" type="range" min="0" max="100" value="25"><div class="out" id="shadow"></div></div></div></section><section id="snippets" class="view"><div class="card"><h3>Local Snippet Vault</h3><p>Save useful code directly in your browser.</p><input id="sname" placeholder="Snippet name"><br><br><textarea id="scode" placeholder="Paste code here"></textarea><br><br><button class="btn primary" id="save">Save snippet</button><div id="list"></div></div></section><section id="challenges" class="view"><div class="card"><h3>Frontend Coding Challenges</h3><p>Short exercises for HTML, CSS and JavaScript practice.</p><div class="challenge"><b>01 · HTML</b><p>Create a button with text <b>Start</b> and class <code>primary-btn</code>.</p></div><div class="challenge"><b>02 · CSS</b><p>Center a 200px box horizontally and give it 16px padding.</p></div><div class="challenge"><b>03 · JavaScript</b><p>Write a function that returns the larger of two numbers.</p><code>function larger(a,b){ }</code></div><div class="challenge"><b>04 · JavaScript</b><p>Convert <code>"hello world"</code> to uppercase.</p></div></div></section></main></div><script>const $=s=>document.querySelector(s);
-const $$=s=>document.querySelectorAll(s);
-const titles={home:"Build faster. Stay focused.",playground:"Code. Run. Learn.",tools:"Developer tools, offline.",snippets:"Your local snippet vault.",challenges:"Practice makes progress."};
-
-function show(id){
-  $$(".view").forEach(v=>v.classList.toggle("active",v.id===id));
-  $$("nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===id));
-  $("#title").textContent=titles[id];
-}
-$$("nav button").forEach(b=>b.addEventListener("click",()=>show(b.dataset.view)));
-$$("[data-go]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.go)));
-
-function runPreview(){
-  const html=$("#html").value;
-  const css=$("#css").value;
-  const js=$("#js").value;
-  const safeJs=js.split("</"+"script").join("<\\/script");
-  $("#frame").srcdoc="<!doctype html><style>"+css+"</style>"+html+"<script>"+safeJs+"<\\/script>";
-}
-$("#run").addEventListener("click",runPreview);
-$("#reset").addEventListener("click",()=>{
-  $("#html").value="<h1>Hello DEVFORGE</h1><p>Edit me.</p>";
-  $("#css").value="body{font-family:system-ui;padding:30px}h1{color:#1769ff}";
-  $("#js").value="document.body.insertAdjacentHTML('beforeend','<p>JavaScript works!</p>');";
-  runPreview();
-});
-runPreview();
-
-$("#fmt").addEventListener("click",()=>{
-  try{$("#jsonout").textContent=JSON.stringify(JSON.parse($("#json").value),null,2)}
-  catch(e){$("#jsonout").textContent="Invalid JSON: "+e.message}
-});
-$("#mini").addEventListener("click",()=>{
-  try{$("#jsonout").textContent=JSON.stringify(JSON.parse($("#json").value))}
-  catch(e){$("#jsonout").textContent="Invalid JSON: "+e.message}
-});
-
-$("#pass").addEventListener("click",()=>{
-  const n=Math.max(4,Math.min(80,Number($("#plen").value)||16));
-  const chars="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*";
-  const a=new Uint32Array(n); crypto.getRandomValues(a);
-  let out=""; a.forEach(x=>out+=chars[x%chars.length]); $("#passout").textContent=out;
-});
-
-$("#convert").addEventListener("click",()=>{
-  try{
-    const base=Number($("#base").value);
-    const n=parseInt($("#num").value.trim(),base);
-    if(Number.isNaN(n)) throw new Error("Invalid number");
-    $("#numout").textContent=base===10?n.toString(2):n.toString(10);
-  }catch(e){$("#numout").textContent=e.message}
-});
-
-function gradient(){
-  const v="linear-gradient("+$("#angle").value+"deg, "+$("#c1").value+", "+$("#c2").value+")";
-  $("#grad").style.background=v; $("#gradout").textContent="background: "+v+";";
-}
-["c1","c2","angle"].forEach(id=>$("#"+id).addEventListener("input",gradient)); gradient();
-
-function shadow(){
-  const v="0 10px "+$("#blur").value+"px rgba(0,0,0,"+Number($("#opa").value)/100+")";
-  $("#shadow").textContent="box-shadow: "+v+";";
-}
-["blur","opa"].forEach(id=>$("#"+id).addEventListener("input",shadow)); shadow();
-
-let snippets=[];
-try{snippets=JSON.parse(localStorage.getItem("devforge")||"[]")}catch(e){snippets=[]}
-function esc(s){return String(s).replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]))}
-function render(){
-  $("#count").textContent=snippets.length;
-  $("#list").innerHTML=snippets.length?snippets.map((s,i)=>"<div class='snippet'><div><b>"+esc(s.name)+"</b><div class='sub'>"+esc(s.code.slice(0,100))+"</div></div><button class='btn deleteSnippet' data-index='"+i+"'>Delete</button></div>").join(""):"<p class='sub'>No snippets saved yet.</p>";
-  $$(".deleteSnippet").forEach(b=>b.addEventListener("click",()=>{snippets.splice(Number(b.dataset.index),1);localStorage.setItem("devforge",JSON.stringify(snippets));render()}));
-}
-$("#save").addEventListener("click",()=>{
-  const name=$("#sname").value.trim(), code=$("#scode").value;
-  if(!name||!code)return;
-  snippets.unshift({name,code}); localStorage.setItem("devforge",JSON.stringify(snippets));
-  $("#sname").value=""; $("#scode").value=""; render();
-});
-render();</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080a0f"><meta name="description" content="FORGE — an offline systems observability laboratory.">
+<title>FORGE — Systems Lab</title><link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app" class="app">
+<header class="topbar"><div class="brand"><div class="brand-mark"><span></span><span></span><span></span></div><div><div class="brand-name">FORGE</div><div class="brand-sub">SYSTEMS LAB <i></i> OFFLINE</div></div></div>
+<div class="top-actions"><div class="status-pill"><span class="live-dot"></span><span id="systemStatus">SYSTEM READY</span></div><button class="icon-btn" id="commandBtn" title="Command palette">⌘K</button><button class="icon-btn" id="themeBtn" title="Toggle theme">◐</button></div></header>
+<main class="workspace">
+<section class="hero-strip"><div><div class="eyebrow">LOCAL DEVELOPMENT TELEMETRY</div><h1>Observe the system.<br><em>Then break it.</em></h1></div><div class="hero-actions"><button class="btn btn-primary" id="runBtn"><span class="play">▶</span> Simulate request <kbd>Space</kbd></button><button class="btn" id="stressBtn">Stress test</button></div></section>
+<section class="metrics-row">
+<article class="metric-card"><span>REQUESTS</span><strong id="mRequests">0</strong><small id="mReqDelta">+0 this run</small></article>
+<article class="metric-card"><span>AVG LATENCY</span><strong id="mLatency">—</strong><small id="mLatencyDelta">waiting for traffic</small></article>
+<article class="metric-card"><span>THROUGHPUT</span><strong id="mThroughput">0 <b>req/s</b></strong><small id="mThroughputDelta">idle</small></article>
+<article class="metric-card"><span>HEALTH</span><strong id="mHealth">100%</strong><small id="mHealthDelta">all services nominal</small></article>
+</section>
+<section class="lab-grid">
+<div class="panel topology-panel"><div class="panel-head"><div><span class="panel-kicker">01</span><strong>TOPOLOGY</strong></div><div class="panel-tools"><button class="tool-btn" id="autoLayoutBtn">Auto layout</button><button class="tool-btn" id="addNodeBtn">＋ Node</button><button class="tool-btn" id="resetBtn">Reset</button></div></div>
+<div class="canvas-wrap"><canvas id="graphCanvas" aria-label="Interactive system topology"></canvas><div class="canvas-hud"><span><i class="key-dot"></i>drag nodes</span><span><i class="key-dot"></i>click to inspect</span><span><kbd>+</kbd><kbd>−</kbd> zoom</span></div><div class="zoom-readout" id="zoomReadout">100%</div></div></div>
+<aside class="panel inspector"><div class="panel-head"><div><span class="panel-kicker">02</span><strong>INSPECTOR</strong></div><span class="mono muted" id="selectedType">NODE</span></div><div id="inspectorBody" class="inspector-body"></div></aside>
+</section>
+<section class="panel telemetry-panel"><div class="panel-head"><div><span class="panel-kicker">03</span><strong>LIVE TELEMETRY</strong></div><div class="telemetry-actions"><span id="eventCount" class="mono muted">0 events</span><button class="tool-btn" id="clearEvents">Clear</button></div></div>
+<div class="telemetry-grid"><div class="event-stream" id="eventStream" aria-live="polite"></div><div class="spark-wrap"><div class="spark-title"><span>LATENCY WINDOW</span><span id="sparkValue">—</span></div><canvas id="sparkCanvas"></canvas><div class="legend"><span><i class="legend-line"></i>ms / request</span><span>rolling 30 samples</span></div></div></div></section>
+</main>
+<footer class="footer"><span>FORGE v1.0 <i></i> ZERO API <i></i> ZERO DEPENDENCIES</span><span>STATE PERSISTED LOCALLY <i></i> <button id="exportBtn">EXPORT SNAPSHOT</button></span></footer>
+</div>
+<div class="toast-stack" id="toastStack"></div>
+<dialog id="commandPalette"><div class="command-shell"><div class="command-input-row"><span>⌘</span><input id="commandInput" autocomplete="off" placeholder="Type a command…"><kbd>ESC</kbd></div><div id="commandList" class="command-list"></div><div class="command-foot">Navigate <kbd>↑</kbd><kbd>↓</kbd> · Execute <kbd>↵</kbd> · Close <kbd>ESC</kbd></div></div></dialog>
+<dialog id="nodeDialog"><form method="dialog" class="node-form" id="nodeForm"><div class="dialog-head"><div><span class="panel-kicker">CREATE</span><h2>New service</h2></div><button class="close-btn" value="cancel">×</button></div><label>Name<input id="newNodeName" required maxlength="20" placeholder="e.g. Search Index"></label><label>Type<select id="newNodeType"><option value="service">SERVICE</option><option value="worker">WORKER</option><option value="database">DATABASE</option><option value="queue">QUEUE</option><option value="cache">CACHE</option></select></label><label>Capacity<input id="newNodeCapacity" type="number" min="1" max="1000" value="180"></label><div class="dialog-actions"><button class="btn" value="cancel">Cancel</button><button class="btn btn-primary" value="default">Create node</button></div></form></dialog>
+<script src="app.js" defer></script>
+</body></html>
